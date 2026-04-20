@@ -1,0 +1,35 @@
+# ApproveKit sample policy
+# Load with: Policy.from_yaml("policy.yaml")
+
+default_timeout: 300   # seconds
+
+rules:
+  - tool: send_email
+    require_approval: true
+    timeout: 120
+    risk_level: high
+
+  - tool: delete_record
+    require_approval: true
+    timeout: 60
+    risk_level: high
+
+  - tool: prod_write
+    require_approval: true
+    timeout: 120
+    risk_level: high
+
+  - tool: pii_access
+    require_approval: true
+    timeout: 120
+    risk_level: medium
+
+  - tool: read_record
+    require_approval: false
+    auto_approve: true
+    risk_level: low
+
+  # Catch-all: unknown tools require approval
+  - tool: "*"
+    require_approval: true
+    risk_level: medium
