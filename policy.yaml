@@ -8,6 +8,7 @@ rules:
     require_approval: true
     timeout: 120
     risk_level: high
+    redact_fields: [body]
 
   - tool: delete_record
     require_approval: true
@@ -18,11 +19,13 @@ rules:
     require_approval: true
     timeout: 120
     risk_level: high
+    redact_fields: [value]
 
   - tool: pii_access
     require_approval: true
     timeout: 120
     risk_level: medium
+    redact_fields: [email, ssn]
 
   - tool: read_record
     require_approval: false

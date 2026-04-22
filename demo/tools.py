@@ -29,6 +29,7 @@ POLICY = Policy.from_dict(
                 "require_approval": True,
                 "timeout": 120,
                 "risk_level": "high",
+                "redact_fields": ["body"],
             },
             {
                 "tool": "delete_record",
@@ -41,12 +42,14 @@ POLICY = Policy.from_dict(
                 "require_approval": True,
                 "timeout": 120,
                 "risk_level": "high",
+                "redact_fields": ["value"],
             },
             {
                 "tool": "pii_access",
                 "require_approval": True,
                 "timeout": 120,
                 "risk_level": "medium",
+                "redact_fields": ["email", "ssn"],
             },
             {
                 "tool": "read_record",
