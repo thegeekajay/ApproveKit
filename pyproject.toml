@@ -21,6 +21,7 @@ dev = [
 
 [project.scripts]
 approvekit-review = "approvekit.reviewer:main"
+approvekit-web = "approvekit.web:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
