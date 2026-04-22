@@ -34,6 +34,8 @@ class PolicyRule:
                           tools that still need audit logging).
         risk_level:       Informational tag – ``"low"``, ``"medium"``, or
                           ``"high"``.
+        redact_fields:    Field names that should be masked before request
+                          payloads are persisted to storage or audit logs.
     """
 
     tool: str
@@ -41,6 +43,7 @@ class PolicyRule:
     timeout: int = DEFAULT_TIMEOUT
     auto_approve: bool = False
     risk_level: str = "low"
+    redact_fields: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -89,6 +92,7 @@ class Policy:
                     timeout=int(raw.get("timeout", default_timeout)),
                     auto_approve=bool(raw.get("auto_approve", False)),
                     risk_level=str(raw.get("risk_level", "low")),
+                    redact_fields=list(raw.get("redact_fields", [])),
                     metadata={
                         k: v
                         for k, v in raw.items()
@@ -99,6 +103,7 @@ class Policy:
                             "timeout",
                             "auto_approve",
                             "risk_level",
+                            "redact_fields",
                         }
                     },
                 )
@@ -163,6 +168,7 @@ class Policy:
                     "timeout": rule.timeout,
                     "auto_approve": rule.auto_approve,
                     "risk_level": rule.risk_level,
+                    "redact_fields": list(rule.redact_fields),
                     **rule.metadata,
                 }
             )
@@ -174,6 +180,7 @@ class Policy:
                     "timeout": self._wildcard.timeout,
                     "auto_approve": self._wildcard.auto_approve,
                     "risk_level": self._wildcard.risk_level,
+                    "redact_fields": list(self._wildcard.redact_fields),
                 }
             )
         return {"default_timeout": self.default_timeout, "rules": rules}

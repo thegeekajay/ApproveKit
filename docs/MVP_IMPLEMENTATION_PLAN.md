@@ -11,8 +11,8 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 
 ## MVP Goals
 
-- [ ] Add policy-level payload redaction for sensitive fields.
-- [ ] Store policy metadata such as `risk_level`, timeout, and approval mode with each request/audit entry.
+- [x] Add policy-level payload redaction for sensitive fields.
+- [x] Store policy metadata such as `risk_level`, timeout, and approval mode with each request/audit entry.
 - [ ] Add a local browser reviewer for pending approvals and audit history.
 - [ ] Upgrade the demo so it clearly shows auto-approve, approve, reject, timeout/default-deny, and redaction.
 - [ ] Publish a static website and docs page explaining the product and integration path.
@@ -23,9 +23,9 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 
 ### Day 1: Core Safety and Local Reviewer
 
-- [ ] Implement redaction fields in policy rules.
-- [ ] Apply redaction before requests and audit entries are persisted.
-- [ ] Attach policy context metadata to requests/audit entries.
+- [x] Implement redaction fields in policy rules.
+- [x] Apply redaction before requests and audit entries are persisted.
+- [x] Attach policy context metadata to requests/audit entries.
 - [ ] Add a standard-library web reviewer with JSON API endpoints.
 - [ ] Add tests for redaction, metadata, and web approve/reject flows.
 

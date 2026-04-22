@@ -31,7 +31,7 @@ import functools
 import inspect
 import logging
 import time
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Iterable, Optional
 
 from approvekit.exceptions import ApprovalRejectedError, ApprovalTimeoutError
 from approvekit.models import ApprovalRequest, ApprovalStatus, AuditEntry
@@ -99,6 +99,8 @@ class ApproveKit:
             tool_name = fn.__name__
             tool_args = _capture_args(fn, args, kwargs)
             rule = self.policy.evaluate(tool_name)
+            stored_args = _redact_args(tool_args, rule.redact_fields)
+            policy_metadata = _policy_metadata(rule)
 
             logger.debug(
                 "ApproveKit intercepted %s | require_approval=%s auto_approve=%s",
@@ -112,14 +114,19 @@ class ApproveKit:
                 result = fn(*args, **kwargs)
                 self._audit(
                     tool_name=tool_name,
-                    tool_args=tool_args,
+                    tool_args=stored_args,
                     status=ApprovalStatus.APPROVED,
                     notes="auto-approved by policy",
+                    metadata=policy_metadata,
                 )
                 return result
 
             # --- Slow path: human review required -------------------------
-            req = ApprovalRequest(tool_name=tool_name, tool_args=tool_args)
+            req = ApprovalRequest(
+                tool_name=tool_name,
+                tool_args=stored_args,
+                metadata=policy_metadata,
+            )
             self.storage.save_request(req)
             logger.info(
                 "Approval required for %s (id=%s). Waiting up to %ds.",
@@ -183,6 +190,7 @@ class ApproveKit:
         status: ApprovalStatus,
         notes: Optional[str] = None,
         request_id: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
         entry = AuditEntry(
             request_id=request_id or "auto",
@@ -190,6 +198,7 @@ class ApproveKit:
             tool_args=tool_args,
             decision=status,
             reviewer_notes=notes,
+            metadata=metadata or {},
         )
         self.storage.save_audit(entry)
 
@@ -200,6 +209,7 @@ class ApproveKit:
             tool_args=req.tool_args,
             decision=req.status,
             reviewer_notes=req.reviewer_notes,
+            metadata=req.metadata,
         )
         self.storage.save_audit(entry)
 
@@ -245,3 +255,39 @@ def _capture_args(fn: Callable, args: tuple, kwargs: dict) -> Dict[str, Any]:
     except (TypeError, ValueError):
         # Fall back to a best-effort representation.
         return {"args": list(args), "kwargs": kwargs}
+
+
+def _policy_metadata(rule: Any) -> Dict[str, Any]:
+    """Return policy context that should travel with the request."""
+    metadata = dict(getattr(rule, "metadata", {}) or {})
+    metadata.update(
+        {
+            "risk_level": rule.risk_level,
+            "timeout": rule.timeout,
+            "require_approval": rule.require_approval,
+            "auto_approve": rule.auto_approve,
+            "redact_fields": list(rule.redact_fields),
+        }
+    )
+    return metadata
+
+
+def _redact_args(value: Any, redact_fields: Iterable[str]) -> Any:
+    """Recursively mask dict fields before storing payloads."""
+    redacted = set(redact_fields)
+    if not redacted:
+        return value
+
+    if isinstance(value, dict):
+        return {
+            key: "[REDACTED]" if key in redacted else _redact_args(item, redacted)
+            for key, item in value.items()
+        }
+
+    if isinstance(value, list):
+        return [_redact_args(item, redacted) for item in value]
+
+    if isinstance(value, tuple):
+        return tuple(_redact_args(item, redacted) for item in value)
+
+    return value
