@@ -1,201 +1,176 @@
 # ApproveKit
 
-**ApproveKit** is a lightweight, framework-agnostic Python middleware for human-in-the-loop (HITL) approval of risky AI agent actions.
+Human approval gates for risky AI agent actions.
 
-It intercepts tool calls such as `send_email`, `delete_record`, `prod_write`, and `pii_access`, evaluates them against simple policy rules, pauses execution when approval is required, and logs every decision in a persistent audit trail.
+ApproveKit is a lightweight, framework-agnostic Python package that wraps tool calls, evaluates simple policy rules, pauses risky actions for human review, and records every outcome in SQLite audit history.
 
----
+It is built for agent builders, platform engineers, and teams who need a practical local-first approval layer before giving agents access to tools like email, production writes, record deletion, or PII access.
 
-## Features
+## What It Does
 
-- 🛡 **Decorator-based middleware** – wrap any callable with `@kit.guard`
-- 📋 **Simple policy config** – dict, JSON, or YAML; supports per-tool rules, timeouts, and auto-approve
-- 💾 **SQLite-backed persistence** – approval requests and full audit history
-- 🔄 **Blocking approval flow** – agent pauses until a reviewer acts or the timeout expires
-- 🖥 **CLI reviewer interface** – approve or reject pending requests from the terminal
-- 🧪 **Tested flows** – approve, reject, and timeout covered by the test suite
+- Wrap any Python callable with `@kit.guard`.
+- Auto-approve low-risk tools while still writing audit entries.
+- Hold risky tool calls until a reviewer approves or rejects them.
+- Default-deny on timeout.
+- Redact configured payload fields before persistence.
+- Review pending requests in a browser with `approvekit-web`.
+- Keep a durable SQLite audit trail.
 
----
-
-## Architecture
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                        AI Agent                          │
-│  result = send_email(to=..., subject=..., body=...)      │
-└────────────────────────┬─────────────────────────────────┘
-                         │  @kit.guard wraps the function
-                         ▼
-┌──────────────────────────────────────────────────────────┐
-│                    ApproveKit Middleware                  │
-│  1. Capture tool name + args                             │
-│  2. Evaluate policy  ──► auto-approve? → call fn()       │
-│  3. Require approval? → save ApprovalRequest to SQLite   │
-│  4. Poll DB every 0.5 s ◄── Reviewer CLI writes decision │
-│  5. APPROVED → call fn()  |  REJECTED → raise error      │
-│                              TIMEOUT  → raise error      │
-└────────────────────────┬─────────────────────────────────┘
-                         │  AuditEntry written on every exit
-                         ▼
-              ┌──────────────────────┐
-              │   SQLite Database    │
-              │  approval_requests   │
-              │  audit_log           │
-              └──────────────────────┘
-```
-
-### Key modules
-
-| Module | Responsibility |
-|---|---|
-| `approvekit/core.py` | `ApproveKit` class, `guard` decorator, polling loop |
-| `approvekit/policy.py` | `Policy` / `PolicyRule` – rule evaluation |
-| `approvekit/storage.py` | Thread-safe SQLite persistence |
-| `approvekit/models.py` | `ApprovalRequest`, `AuditEntry`, `ApprovalStatus` |
-| `approvekit/reviewer.py` | Interactive CLI for reviewing pending requests |
-| `approvekit/exceptions.py` | `ApprovalRejectedError`, `ApprovalTimeoutError` |
-| `demo/` | Sample tools and agent |
-
----
-
-## Setup
-
-**Requirements:** Python 3.9+
+## Install
 
 ```bash
-# Clone and install (editable, with dev dependencies)
-git clone https://github.com/thegeekajay/ApproveKit.git
-cd ApproveKit
-pip install -e ".[dev]"
+python3 -m pip install -e ".[dev]"
 ```
-
----
 
 ## Quick Start
 
-### 1. Define a policy
-
 ```python
-from approvekit import ApproveKit, Policy
+from approvekit import ApproveKit, Policy, Storage
 
 policy = Policy.from_dict({
-    "default_timeout": 300,          # seconds
+    "default_timeout": 60,
     "rules": [
-        {"tool": "send_email",    "require_approval": True,  "risk_level": "high"},
-        {"tool": "delete_record", "require_approval": True,  "timeout": 60},
-        {"tool": "read_record",   "require_approval": False, "auto_approve": True},
-    ]
+        {
+            "tool": "send_email",
+            "require_approval": True,
+            "risk_level": "high",
+            "redact_fields": ["body"],
+        },
+        {
+            "tool": "read_record",
+            "require_approval": False,
+            "auto_approve": True,
+            "risk_level": "low",
+        },
+    ],
 })
-```
 
-You can also load policy from a file:
-
-```python
-policy = Policy.from_yaml("policy.yaml")
-policy = Policy.from_json("policy.json")
-```
-
-### 2. Create a kit and guard your tools
-
-```python
-from approvekit.storage import Storage
-
-storage = Storage(db_path="/tmp/approvekit.db")   # persistent
+storage = Storage(db_path="/tmp/approvekit.db")
 kit = ApproveKit(policy=policy, storage=storage)
 
 @kit.guard
 def send_email(to: str, subject: str, body: str) -> dict:
-    # real implementation here
-    ...
+    return {"status": "sent", "to": to, "subject": subject}
 
-@kit.guard
-def delete_record(table: str, record_id: int) -> dict:
-    ...
+send_email(
+    to="ceo@example.com",
+    subject="Quarterly report",
+    body="Sensitive content that will be redacted in storage.",
+)
 ```
-
-### 3. Call tools from your agent
-
-```python
-from approvekit.exceptions import ApprovalRejectedError, ApprovalTimeoutError
-
-try:
-    send_email(to="ceo@example.com", subject="Quarterly Report", body="…")
-except ApprovalRejectedError as e:
-    print(f"Rejected: {e}")
-except ApprovalTimeoutError as e:
-    print(f"Timed out: {e}")
-```
-
-The agent **blocks** at the guarded call until a reviewer approves, rejects, or the timeout fires.
-
-### 4. Review pending requests
 
 In a second terminal:
 
 ```bash
-approvekit-review --db /tmp/approvekit.db
+approvekit-web --db /tmp/approvekit.db --port 8765
 ```
 
-```
-=== ApproveKit Reviewer ===
+Open `http://127.0.0.1:8765` to approve or reject the pending request.
 
---- 1 pending request(s) ---
+## Guided Demo
 
-[1] send_email
-  ID         : 3f7a…
-  Tool       : send_email
-  Args       : {'to': 'ceo@example.com', 'subject': 'Quarterly Report', …}
-  Created At : 2024-01-15 10:30:00 UTC
-  Status     : pending
-
-approvekit> approve 3f7a Looks good
-✓ Approved request 3f7a… for tool 'send_email'.
-```
-
-Available commands: `list`, `approve <id> [notes]`, `reject <id> [notes]`, `audit`, `quit`.
-
----
-
-## Running the Demo
+Terminal 1:
 
 ```bash
-# Terminal 1 – start the agent
-python demo/agent.py
+python3 demo/agent.py --db /tmp/approvekit_demo.db --reset
+```
 
-# Terminal 2 – review pending requests
+Terminal 2:
+
+```bash
+approvekit-web --db /tmp/approvekit_demo.db --port 8765
+```
+
+The demo walks through:
+
+- auto-approved read
+- approval-required email
+- PII access with redacted fields
+- rejected delete
+- production write that times out unless reviewed
+
+The terminal reviewer is still available:
+
+```bash
 approvekit-review --db /tmp/approvekit_demo.db
 ```
 
----
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
-Tests cover:
-- `test_approve.py` – happy path: auto-approve and human approval
-- `test_reject.py` – reviewer rejects; tool body does not execute
-- `test_timeout.py` – no reviewer acts; `ApprovalTimeoutError` is raised
-- `test_policy.py` – policy rule matching, defaults, YAML/JSON loading
-- `test_storage.py` – SQLite CRUD for requests and audit entries
-
----
-
 ## Policy Reference
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `tool` | str | required | Tool name, or `"*"` for wildcard |
-| `require_approval` | bool | `false` | Block and wait for human approval |
-| `timeout` | int (s) | `300` | Seconds before `ApprovalTimeoutError` |
-| `auto_approve` | bool | `false` | Log and execute immediately, no human needed |
-| `risk_level` | str | `"low"` | Informational: `"low"`, `"medium"`, `"high"` |
+```yaml
+default_timeout: 60
 
----
+rules:
+  - tool: send_email
+    require_approval: true
+    timeout: 45
+    risk_level: high
+    redact_fields: [body]
+
+  - tool: read_record
+    require_approval: false
+    auto_approve: true
+    risk_level: low
+
+  - tool: "*"
+    require_approval: true
+    risk_level: medium
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `tool` | string | Exact tool name, or `*` for fallback. |
+| `require_approval` | bool | Whether a human decision is required before execution. |
+| `timeout` | int | Seconds to wait before default-deny timeout. |
+| `auto_approve` | bool | Execute immediately and write an approved audit entry. |
+| `risk_level` | string | Informational label shown in reviewer UI and audit metadata. |
+| `redact_fields` | list | Dict field names to mask before request/audit persistence. |
+
+## Architecture
+
+```text
+Agent tool call
+  -> ApproveKit guard
+  -> Policy evaluation
+  -> Auto-approved path OR pending request in SQLite
+  -> Web/CLI reviewer decision
+  -> Approved tool execution OR rejected/timeout block
+  -> Audit entry
+```
+
+Only approved risky requests execute the wrapped tool body. Rejected and timed-out requests are persisted and audited without executing the action.
+
+## Project Structure
+
+```text
+approvekit/
+  core.py       # guard decorator and approval wait loop
+  policy.py     # policy rules, YAML/JSON loading, redaction settings
+  storage.py    # SQLite request and audit persistence
+  reviewer.py   # terminal reviewer
+  web.py        # local browser reviewer
+demo/
+  agent.py      # guided two-terminal demo
+tests/
+  test_*.py     # approve, reject, timeout, storage, policy, web tests
+docs/
+  MVP_IMPLEMENTATION_PLAN.md
+```
+
+## Development
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m pytest -q
+```
+
+## Documentation
+
+- Landing page: `index.html`
+- Developer docs: `docs.html`
+- MVP tracker: `docs/MVP_IMPLEMENTATION_PLAN.md`
+- Changelog: `CHANGELOG.md`
 
 ## License
 
 MIT
-
