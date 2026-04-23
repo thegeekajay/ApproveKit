@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ApproveKit Docs</title>
+  <meta name="description" content="Developer documentation for ApproveKit: install, policy, guarded tools, web reviewer, audit trail, and demo commands.">
+  <link rel="icon" type="image/svg+xml" href="assets/approvekit_mark.svg">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="ApproveKit home">
+        <img src="assets/approvekit_mark.svg" alt="">
+        <span>ApproveKit</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="#install">Install</a>
+        <a href="#policy">Policy</a>
+        <a href="#reviewer">Reviewer</a>
+        <a href="#api">API</a>
+        <a href="https://github.com/thegeekajay/ApproveKit">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container doc-layout">
+    <aside class="sidebar" aria-label="Documentation sections">
+      <a href="#overview">Overview</a>
+      <a href="#install">Install</a>
+      <a href="#guard">Guard Tools</a>
+      <a href="#policy">Policy</a>
+      <a href="#reviewer">Reviewer</a>
+      <a href="#api">Local API</a>
+      <a href="#audit">Audit</a>
+      <a href="#demo">Demo</a>
+    </aside>
+
+    <div class="doc-content">
+      <section class="doc-card" id="overview">
+        <span class="kicker">Developer docs</span>
+        <h2>Human approval middleware for Python tool calls.</h2>
+        <p>ApproveKit wraps ordinary Python functions. It evaluates policy before execution, blocks risky calls for human review, and records final decisions in SQLite.</p>
+      </section>
+
+      <section class="doc-card" id="install">
+        <h2>Install</h2>
+        <pre>python3 -m pip install -e ".[dev]"</pre>
+        <p>The MVP targets Python 3.9+ and only requires PyYAML at runtime.</p>
+      </section>
+
+      <section class="doc-card" id="guard">
+        <h2>Guard Tools</h2>
+        <pre>from approvekit import ApproveKit, Policy, Storage
+
+policy = Policy.from_yaml("policy.yaml")
+storage = Storage(db_path="/tmp/approvekit.db")
+kit = ApproveKit(policy=policy, storage=storage)
+
+@kit.guard
+def prod_write(key: str, value: dict) -> dict:
+    return {"status": "written", "key": key}</pre>
+        <p>If policy requires approval, the function body does not run until a reviewer approves the request.</p>
+      </section>
+
+      <section class="doc-card" id="policy">
+        <h2>Policy</h2>
+        <pre>default_timeout: 60
+
+rules:
+  - tool: prod_write
+    require_approval: true
+    timeout: 30
+    risk_level: high
+    redact_fields: [value]
+
+  - tool: read_record
+    require_approval: false
+    auto_approve: true
+    risk_level: low
+
+  - tool: "*"
+    require_approval: true
+    risk_level: medium</pre>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>tool</code></td>
+              <td>Exact function name, or <code>*</code> for unknown tools.</td>
+            </tr>
+            <tr>
+              <td><code>require_approval</code></td>
+              <td>Creates a pending request before execution.</td>
+            </tr>
+            <tr>
+              <td><code>timeout</code></td>
+              <td>Seconds before the request defaults to denied.</td>
+            </tr>
+            <tr>
+              <td><code>auto_approve</code></td>
+              <td>Executes immediately while still writing an approved audit entry.</td>
+            </tr>
+            <tr>
+              <td><code>redact_fields</code></td>
+              <td>Masks matching dict keys recursively before storing request and audit payloads.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-card" id="reviewer">
+        <h2>Reviewer UI</h2>
+        <pre>approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
+        <p>The local browser reviewer shows pending requests, policy metadata, redacted arguments, approval/rejection controls, reviewer notes, and recent audit entries.</p>
+        <h3>CLI fallback</h3>
+        <pre>approvekit-review --db /tmp/approvekit_demo.db</pre>
+      </section>
+
+      <section class="doc-card" id="api">
+        <h2>Local JSON API</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GET /api/requests?status=pending</code></td>
+              <td>List pending approval requests.</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/requests?status=all</code></td>
+              <td>List all requests.</td>
+            </tr>
+            <tr>
+              <td><code>POST /api/requests/&lt;id&gt;/approve</code></td>
+              <td>Approve a pending request with optional JSON notes.</td>
+            </tr>
+            <tr>
+              <td><code>POST /api/requests/&lt;id&gt;/reject</code></td>
+              <td>Reject a pending request with optional JSON notes.</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/audit</code></td>
+              <td>Return audit history.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-card" id="audit">
+        <h2>Audit Behavior</h2>
+        <ul>
+          <li>Auto-approved calls create approved audit entries.</li>
+          <li>Approved risky calls execute and then write approved audit entries.</li>
+          <li>Rejected calls do not execute and write rejected audit entries.</li>
+          <li>Timed-out calls do not execute and write timeout audit entries.</li>
+          <li>Redacted fields stay masked in requests and audit logs.</li>
+        </ul>
+      </section>
+
+      <section class="doc-card" id="demo">
+        <h2>Guided Demo</h2>
+        <pre>python3 demo/agent.py --db /tmp/approvekit_demo.db --reset
+approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
+        <p>Approve the email, approve the PII request, reject the delete request, and leave the production write alone to see timeout/default-deny behavior.</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
