@@ -6,6 +6,13 @@ The format follows Keep a Changelog, and ApproveKit uses Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-04-24
+
+### Added
+
+- Web reviewer and terminal reviewer screenshots embedded in README.
+- Architecture and infographic design assets added to `assets/`.
+
 ## [0.1.1] - 2026-04-24
 
 ### Added
@@ -37,6 +44,7 @@ The format follows Keep a Changelog, and ApproveKit uses Semantic Versioning.
 - MIT license and project metadata.
 - Tests for approve, reject, timeout, policy, storage, and web reviewer.
 
-[Unreleased]: https://github.com/thegeekajay/ApproveKit/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/thegeekajay/ApproveKit/compare/v0.1.2...HEAD
 [0.1.1]: https://github.com/thegeekajay/ApproveKit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/thegeekajay/ApproveKit/releases/tag/v0.1.0
+[0.1.2]: https://github.com/thegeekajay/ApproveKit/compare/v0.1.1...v0.1.2
