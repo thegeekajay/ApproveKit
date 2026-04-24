@@ -2,7 +2,7 @@
 
 Human approval gates for risky AI agent actions.
 
-![ApproveKit](http://approvekit.theajaykumar.com/assets/logo/approvekit-logo-stacked.png)
+![ApproveKit](https://raw.githubusercontent.com/thegeekajay/ApproveKit/main/assets/logo/approvekit-logo-stacked.png)
 
 ApproveKit is a lightweight, framework-agnostic Python package that wraps tool calls, evaluates simple policy rules, pauses risky actions for human review, and records every outcome in SQLite audit history.
 
