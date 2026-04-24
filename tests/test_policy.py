@@ -109,3 +109,22 @@ def test_as_dict_roundtrip():
     d = policy.as_dict()
     assert d["default_timeout"] == 60
     assert any(r["tool"] == "send_email" for r in d["rules"])
+
+
+def test_redact_fields_roundtrip():
+    policy = Policy.from_dict(
+        {
+            "rules": [
+                {
+                    "tool": "send_email",
+                    "require_approval": True,
+                    "redact_fields": ["body", "ssn"],
+                },
+            ],
+        }
+    )
+
+    rule = policy.evaluate("send_email")
+
+    assert rule.redact_fields == ["body", "ssn"]
+    assert policy.as_dict()["rules"][0]["redact_fields"] == ["body", "ssn"]

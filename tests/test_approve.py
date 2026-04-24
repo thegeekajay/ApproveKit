@@ -7,6 +7,7 @@ import time
 
 import pytest
 
+from approvekit import ApproveKit, Policy
 from approvekit.models import ApprovalStatus
 
 
@@ -106,3 +107,67 @@ def test_args_captured_in_audit(kit, storage):
 
     entries = storage.list_audit()
     assert entries[0].tool_args == {"a": 1, "b": "hello"}
+
+
+def test_redacted_fields_are_stored_but_original_args_execute(storage):
+    """Sensitive fields should be masked in storage without changing execution."""
+    policy = Policy.from_dict(
+        {
+            "default_timeout": 2,
+            "rules": [
+                {
+                    "tool": "send_email",
+                    "require_approval": True,
+                    "timeout": 2,
+                    "risk_level": "high",
+                    "redact_fields": ["body", "ssn"],
+                },
+            ],
+        }
+    )
+    kit = ApproveKit(policy=policy, storage=storage, poll_interval=0.05)
+    executed = []
+
+    @kit.guard
+    def send_email(to: str, body: str, profile: dict) -> str:
+        executed.append({"to": to, "body": body, "profile": profile})
+        return body
+
+    def _approve():
+        time.sleep(0.1)
+        pending = storage.list_pending()
+        assert len(pending) == 1
+        assert pending[0].tool_args == {
+            "to": "ceo@example.com",
+            "body": "[REDACTED]",
+            "profile": {"name": "Alice", "ssn": "[REDACTED]"},
+        }
+        assert pending[0].metadata["risk_level"] == "high"
+        assert pending[0].metadata["timeout"] == 2
+        assert pending[0].metadata["redact_fields"] == ["body", "ssn"]
+        kit.approve(pending[0].id, notes="safe after review")
+
+    t = threading.Thread(target=_approve, daemon=True)
+    t.start()
+
+    result = send_email(
+        to="ceo@example.com",
+        body="confidential report",
+        profile={"name": "Alice", "ssn": "123-45-6789"},
+    )
+
+    t.join(timeout=2)
+
+    assert result == "confidential report"
+    assert executed == [
+        {
+            "to": "ceo@example.com",
+            "body": "confidential report",
+            "profile": {"name": "Alice", "ssn": "123-45-6789"},
+        }
+    ]
+
+    entries = storage.list_audit()
+    assert entries[0].tool_args["body"] == "[REDACTED]"
+    assert entries[0].tool_args["profile"]["ssn"] == "[REDACTED]"
+    assert entries[0].metadata["risk_level"] == "high"
