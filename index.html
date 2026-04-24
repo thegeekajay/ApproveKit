@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ApproveKit - Human approval for risky agent actions</title>
+  <meta name="description" content="ApproveKit is an open-source Python approval layer for risky AI agent actions. Wrap tools, require human review, redact payloads, and keep audit history.">
+  <link rel="icon" type="image/svg+xml" href="assets/approvekit_mark.svg">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="ApproveKit home">
+        <img src="assets/approvekit_mark.svg" alt="">
+        <span>ApproveKit</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#why">Why</a>
+        <a href="#how">How it works</a>
+        <a href="#demo">Demo</a>
+        <a href="docs.html">Docs</a>
+        <a href="https://github.com/thegeekajay/ApproveKit">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Open-source approval middleware</span>
+          <h1>ApproveKit</h1>
+          <p>Human approval gates for risky AI agent actions. Wrap Python tools, pause dangerous calls, review them in a local browser, and keep a redacted audit trail.</p>
+          <div class="actions">
+            <a class="button primary" href="docs.html">Read the docs</a>
+            <a class="button secondary" href="#demo">See the demo flow</a>
+          </div>
+        </div>
+
+        <div class="demo-shell" aria-label="ApproveKit reviewer preview">
+          <div class="demo-top">
+            <span>approvekit-web</span>
+            <span>http://127.0.0.1:8765</span>
+          </div>
+          <div class="demo-body">
+            <div class="review-panel">
+              <div class="request-preview">
+                <article class="request-card">
+                  <div class="request-head">
+                    <div>
+                      <div class="tool-name">send_email</div>
+                      <div class="pill-row">
+                        <span class="pill high">risk: high</span>
+                        <span class="pill">timeout: 45s</span>
+                        <span class="pill">pending</span>
+                      </div>
+                    </div>
+                  </div>
+                  <pre>{
+  "to": "ceo@example.com",
+  "subject": "Quarterly report",
+  "body": "[REDACTED]"
+}</pre>
+                  <div class="decision-row">
+                    <div class="decision approve">Approve</div>
+                    <div class="decision reject">Reject</div>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <div class="terminal-panel">
+              <div class="term-line">$ python3 demo/agent.py --reset</div>
+              <div class="term-line term-muted">Step 1: read_record auto-approved</div>
+              <div class="term-line">Step 2: send_email waiting...</div>
+              <div class="term-line term-muted">Reviewer approved request</div>
+              <div class="term-line">EXECUTED send_email</div>
+              <div class="term-line term-muted">Audit: send_email approved risk=high</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Why teams need it</span>
+          <h2>Agents should not get production power without a checkpoint.</h2>
+          <p>ApproveKit makes human review a reusable middleware capability instead of one-off approval logic scattered through every tool.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Stop unsafe execution</h3>
+            <p>Rejected and timed-out requests never run the wrapped tool body. The default failure mode is deny.</p>
+          </article>
+          <article class="card">
+            <h3>Show the reviewer context</h3>
+            <p>Risk labels, arguments, notes, timestamps, and policy metadata stay attached to each request.</p>
+          </article>
+          <article class="card">
+            <h3>Keep audit history</h3>
+            <p>Every approval, rejection, timeout, and auto-approved call is persisted for local inspection.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="how">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">How it works</span>
+          <h2>A small policy gate in the tool execution path.</h2>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Agent calls a guarded tool</h3>
+              <p>The `@kit.guard` decorator captures tool name and arguments before execution.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Policy decides approval mode</h3>
+              <p>Safe tools execute immediately. Risky tools become pending approval requests.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Reviewer approves or rejects</h3>
+              <p>The browser reviewer shows redacted payloads, risk labels, and decision notes.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>Audit is recorded</h3>
+              <p>Approved calls execute. Rejected and timed-out calls are blocked and logged.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Run it locally</span>
+          <h2>Two terminals are enough for the MVP demo.</h2>
+          <p>The demo creates a shared SQLite database. The agent waits while the reviewer makes decisions in the browser.</p>
+        </div>
+        <div class="code-grid">
+          <article class="card">
+            <h3>Terminal 1</h3>
+            <pre>python3 -m pip install -e ".[dev]"
+python3 demo/agent.py --db /tmp/approvekit_demo.db --reset</pre>
+          </article>
+          <article class="card">
+            <h3>Terminal 2</h3>
+            <pre>approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      ApproveKit is MIT licensed and built for local-first agent governance demos.
+    </div>
+  </footer>
+</body>
+</html>
