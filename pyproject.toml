@@ -9,6 +9,20 @@ description = "Human-in-the-loop approval middleware for risky AI agent actions"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
+authors = [
+    {name = "Ajay Kumar Ganesh", email = "thegeekajay@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "pyyaml>=6.0",
 ]
@@ -23,10 +37,14 @@ dev = [
 approvekit-review = "approvekit.reviewer:main"
 approvekit-web = "approvekit.web:main"
 
+[project.urls]
+Homepage = "https://github.com/thegeekajay/ApproveKit"
+Repository = "https://github.com/thegeekajay/ApproveKit"
+Issues = "https://github.com/thegeekajay/ApproveKit/issues"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["approvekit*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-timeout = 30

@@ -16,7 +16,7 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 - [x] Add a local browser reviewer for pending approvals and audit history.
 - [x] Upgrade the demo so it clearly shows auto-approve, approve, reject, timeout/default-deny, and redaction.
 - [ ] Publish a static website and docs page explaining the product and integration path.
-- [ ] Add OSS polish: changelog, license, package metadata, and CI.
+- [x] Add OSS polish: changelog, license, package metadata, and CI.
 - [ ] Keep implementation in small commits with clear commit messages.
 
 ## Day-by-Day Build Plan
@@ -32,10 +32,10 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 ### Day 2: Demo and Public Surface
 
 - [x] Rewrite the demo as a guided script using one shared SQLite database.
-- [ ] Add README quickstart and demo instructions.
+- [x] Add README quickstart and demo instructions.
 - [ ] Add a static landing page with integration snippet and reviewer screenshot-style UI.
 - [ ] Add developer docs covering policy, reviewer UI, API shape, audit behavior, and demo commands.
-- [ ] Add changelog and CI workflow.
+- [x] Add changelog and CI workflow.
 
 ### Day 3 Buffer: Polish and Release Readiness
 
