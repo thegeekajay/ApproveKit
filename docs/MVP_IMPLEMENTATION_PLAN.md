@@ -14,7 +14,7 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 - [x] Add policy-level payload redaction for sensitive fields.
 - [x] Store policy metadata such as `risk_level`, timeout, and approval mode with each request/audit entry.
 - [x] Add a local browser reviewer for pending approvals and audit history.
-- [ ] Upgrade the demo so it clearly shows auto-approve, approve, reject, timeout/default-deny, and redaction.
+- [x] Upgrade the demo so it clearly shows auto-approve, approve, reject, timeout/default-deny, and redaction.
 - [ ] Publish a static website and docs page explaining the product and integration path.
 - [ ] Add OSS polish: changelog, license, package metadata, and CI.
 - [ ] Keep implementation in small commits with clear commit messages.
@@ -31,7 +31,7 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 
 ### Day 2: Demo and Public Surface
 
-- [ ] Rewrite the demo as a guided script using one shared SQLite database.
+- [x] Rewrite the demo as a guided script using one shared SQLite database.
 - [ ] Add README quickstart and demo instructions.
 - [ ] Add a static landing page with integration snippet and reviewer screenshot-style UI.
 - [ ] Add developer docs covering policy, reviewer UI, API shape, audit behavior, and demo commands.
