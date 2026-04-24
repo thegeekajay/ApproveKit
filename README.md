@@ -8,6 +8,16 @@ ApproveKit is a lightweight, framework-agnostic Python package that wraps tool c
 
 It is built for agent builders, platform engineers, and teams who need a practical local-first approval layer before giving agents access to tools like email, production writes, record deletion, or PII access.
 
+## Reviewers
+
+**Browser reviewer** — approve or reject pending requests from a local web UI:
+
+![Web reviewer UI showing two pending approval requests with approve and reject buttons](https://raw.githubusercontent.com/thegeekajay/ApproveKit/main/assets/screenshots/web-reviewer.png)
+
+**Terminal reviewer** — inspect, approve, and reject from the command line:
+
+![Terminal reviewer showing list output and approve/reject commands](https://raw.githubusercontent.com/thegeekajay/ApproveKit/main/assets/screenshots/terminal-reviewer.png)
+
 ## What It Does
 
 - Wrap any Python callable with `@kit.guard`.

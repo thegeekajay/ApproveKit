@@ -10,15 +10,15 @@ The format follows Keep a Changelog, and ApproveKit uses Semantic Versioning.
 
 ### Added
 
-- 
+- `__version__` constant exported from `approvekit` package.
+- One-command release helper (`release.py`) for patch/minor/major releases with automated version bumping, CHANGELOG scaffolding, build, tag, push, and GitHub release creation.
+- GitHub Actions publish workflow (`.github/workflows/publish-pypi.yml`) that automatically publishes to TestPyPI then PyPI on each GitHub Release.
+- Maintainer Release Flow section in README documenting the one-command release process.
 
 ### Changed
 
-- 
-
-### Fixed
-
-- 
+- Project URLs in `pyproject.toml` updated to custom domain (`http://approvekit.theajaykumar.com`).
+- README logo image switched to HTTPS GitHub raw URL for correct rendering on PyPI and GitHub.
 
 ## [0.1.0] - 2026-04-24
 
