@@ -57,6 +57,7 @@
   <main class="container doc-layout">
     <aside class="sidebar" aria-label="Documentation sections">
       <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
       <a href="#install">Install</a>
       <a href="#guard">Guard Tools</a>
       <a href="#policy">Policy</a>
@@ -71,6 +72,15 @@
         <span class="kicker">Developer docs</span>
         <h2>Human approval middleware for Python tool calls.</h2>
         <p>ApproveKit wraps ordinary Python functions. It evaluates policy before execution, blocks risky calls for human review, and records final decisions in SQLite.</p>
+      </section>
+
+      <section class="doc-card" id="architecture">
+        <h2>Architecture</h2>
+        <p>Full request lifecycle — from agent runtime through policy evaluation and human review to audit persistence.</p>
+        <figure class="arch-figure" aria-label="ApproveKit approval flow architecture diagram">
+          <img class="themed-img themed-img-light" src="assets/flow_arch_light.png" alt="ApproveKit Approval Flow Architecture: 9-step diagram showing Agent Runtime → Tool Invocation → ApproveKit Middleware → Policy Engine → Decision Store → Reviewer UI → Approval Decision → Tool Executor → Audit Log, with auto-allow and approval-required paths.">
+          <img class="themed-img themed-img-dark" src="assets/flow_arch_dark.png" alt="ApproveKit Approval Flow Architecture: 9-step diagram showing Agent Runtime → Tool Invocation → ApproveKit Middleware → Policy Engine → Decision Store → Reviewer UI → Approval Decision → Tool Executor → Audit Log, with auto-allow and approval-required paths.">
+        </figure>
       </section>
 
       <section class="doc-card" id="install">
@@ -148,6 +158,16 @@ rules:
         <h2>Reviewer UI</h2>
         <pre>approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
         <p>The local browser reviewer shows pending requests, policy metadata, redacted arguments, approval/rejection controls, reviewer notes, and recent audit entries.</p>
+        <div class="reviewer-screenshots">
+          <figure class="reviewer-screenshot-card">
+            <img src="assets/screenshots/web-reviewer.png" alt="ApproveKit web reviewer: browser inbox showing send_email and delete_record pending requests with redacted payloads, Approve/Reject buttons, and audit trail panel.">
+            <figcaption>Web reviewer — <code>approvekit-web</code></figcaption>
+          </figure>
+          <figure class="reviewer-screenshot-card">
+            <img src="assets/screenshots/terminal-reviewer.png" alt="ApproveKit terminal reviewer: CLI session listing 2 pending requests and approving send_email, rejecting delete_record with reviewer notes.">
+            <figcaption>Terminal reviewer — <code>approvekit-review</code></figcaption>
+          </figure>
+        </div>
         <h3>CLI fallback</h3>
         <pre>approvekit-review --db /tmp/approvekit_demo.db</pre>
       </section>
