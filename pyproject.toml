@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "approvekit"
-version = "0.1.0"
+version = "0.1.1"
 description = "Human-in-the-loop approval middleware for risky AI agent actions"
 readme = "README.md"
 license = { text = "MIT" }

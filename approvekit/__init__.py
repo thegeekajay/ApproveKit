@@ -23,8 +23,7 @@ from approvekit.models import ApprovalRequest, ApprovalStatus, AuditEntry
 from approvekit.policy import Policy, PolicyRule
 from approvekit.storage import Storage
 
-__version__ = "0.1.0"
-
+__version__ = "0.1.1"
 __all__ = [
     "ApproveKit",
     "ApprovalRequest",
