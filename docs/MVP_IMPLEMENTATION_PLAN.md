@@ -2,10 +2,10 @@
 
 ApproveKit is moving from a working Python library into a demo-ready open source MVP. This tracker is intentionally kept in the repo so the implementation can be followed through small, reviewable commits.
 
-## Current Baseline
+## Original Baseline Before MVP Pass
 
 - Core package exists with `ApproveKit.guard`, policy evaluation, SQLite storage, approval/rejection/timeout behavior, and CLI review.
-- Demo agent exists, but it does not yet show the full reviewer/web/audit story.
+- Demo agent existed, but did not yet show the full reviewer/web/audit story.
 - Test baseline before this tracker: `python3 -m pytest -q` passes with 28 tests.
 - Existing commit history already shows initial project work from April 20-21, 2026.
 
@@ -42,7 +42,7 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 - [x] Run full tests.
 - [x] Review website copy and mobile layout.
 - [x] Finalize tracker checkboxes.
-- [ ] Prepare for a `v0.1.0` tag when ready.
+- [ ] Prepare release tag when ready.
 
 ## Demo Acceptance Criteria
 
