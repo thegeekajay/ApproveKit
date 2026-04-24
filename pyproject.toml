@@ -38,8 +38,8 @@ approvekit-review = "approvekit.reviewer:main"
 approvekit-web = "approvekit.web:main"
 
 [project.urls]
-Homepage = "https://thegeekajay.github.io/ApproveKit"
-Documentation = "https://thegeekajay.github.io/ApproveKit/docs.html"
+Homepage = "http://approvekit.theajaykumar.com"
+Documentation = "http://approvekit.theajaykumar.com/docs.html"
 Repository = "https://github.com/thegeekajay/ApproveKit"
 Issues = "https://github.com/thegeekajay/ApproveKit/issues"
 Changelog = "https://github.com/thegeekajay/ApproveKit/blob/main/CHANGELOG.md"

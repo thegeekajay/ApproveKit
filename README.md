@@ -2,6 +2,8 @@
 
 Human approval gates for risky AI agent actions.
 
+![ApproveKit](http://approvekit.theajaykumar.com/assets/logo/approvekit-logo-stacked.png)
+
 ApproveKit is a lightweight, framework-agnostic Python package that wraps tool calls, evaluates simple policy rules, pauses risky actions for human review, and records every outcome in SQLite audit history.
 
 It is built for agent builders, platform engineers, and teams who need a practical local-first approval layer before giving agents access to tools like email, production writes, record deletion, or PII access.
@@ -199,8 +201,8 @@ Publishing is then handled automatically by `.github/workflows/publish-pypi.yml`
 
 ## Documentation
 
-- Landing page: `index.html`
-- Developer docs: `docs.html`
+- Landing page: http://approvekit.theajaykumar.com
+- Developer docs: http://approvekit.theajaykumar.com/docs.html
 - MVP tracker: `docs/MVP_IMPLEMENTATION_PLAN.md`
 - Changelog: `CHANGELOG.md`
 
