@@ -13,6 +13,7 @@ The format follows Keep a Changelog, and ApproveKit uses Semantic Versioning.
 - Policy `redact_fields` for masking sensitive payload values before persistence.
 - Policy context metadata on approval requests and audit entries.
 - Guided demo agent with approve, reject, timeout/default-deny, and redaction paths.
+- Static landing page and developer documentation page.
 - MVP implementation tracker in `docs/MVP_IMPLEMENTATION_PLAN.md`.
 - Project metadata, MIT license, and GitHub Actions test workflow.
 
