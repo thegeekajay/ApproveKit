@@ -38,9 +38,11 @@ approvekit-review = "approvekit.reviewer:main"
 approvekit-web = "approvekit.web:main"
 
 [project.urls]
-Homepage = "https://github.com/thegeekajay/ApproveKit"
+Homepage = "https://thegeekajay.github.io/ApproveKit"
+Documentation = "https://thegeekajay.github.io/ApproveKit/docs.html"
 Repository = "https://github.com/thegeekajay/ApproveKit"
 Issues = "https://github.com/thegeekajay/ApproveKit/issues"
+Changelog = "https://github.com/thegeekajay/ApproveKit/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["."]

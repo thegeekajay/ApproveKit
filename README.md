@@ -19,6 +19,12 @@ It is built for agent builders, platform engineers, and teams who need a practic
 ## Install
 
 ```bash
+pip install approvekit
+```
+
+For local development:
+
+```bash
 python3 -m pip install -e ".[dev]"
 ```
 
