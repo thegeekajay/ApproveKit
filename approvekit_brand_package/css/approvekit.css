@@ -1,0 +1,170 @@
+:root {
+  /* ApproveKit brand */
+  --ak-blue: #2563EB;
+  --ak-green: #22C55E;
+  --ak-ink: #0F172A;
+  --ak-slate: #64748B;
+  --ak-fog: #F8FAFC;
+  --ak-gray-200: #E5E7EB;
+
+  /* Light theme defaults */
+  --ak-bg: #FFFFFF;
+  --ak-fg: #0F172A;
+  --ak-muted: #64748B;
+  --ak-card: #FFFFFF;
+  --ak-border: #E5E7EB;
+  --ak-ring: rgba(37, 99, 235, 0.25);
+  --ak-focus: #2563EB;
+  --ak-success: #22C55E;
+  --ak-danger: #EF4444;
+  --ak-warning: #F59E0B;
+  --ak-info: #2563EB;
+
+  /* Spacing, radius, and shadows */
+  --ak-space-1: 4px;
+  --ak-space-2: 8px;
+  --ak-space-3: 12px;
+  --ak-space-4: 16px;
+  --ak-space-5: 24px;
+  --ak-space-6: 32px;
+  --ak-space-7: 48px;
+  --ak-space-8: 64px;
+
+  --ak-radius-sm: 6px;
+  --ak-radius-md: 10px;
+  --ak-radius-lg: 16px;
+  --ak-radius-xl: 24px;
+
+  --ak-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --ak-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --ak-shadow-lg: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.theme-dark,
+[data-theme="dark"] {
+  --ak-bg: #0B1020;
+  --ak-fg: #F1F5F9;
+  --ak-muted: #94A3B8;
+  --ak-card: #111827;
+  --ak-border: #1F2937;
+  --ak-ring: rgba(37, 99, 235, 0.35);
+  --ak-focus: #60A5FA;
+  --ak-success: #22C55E;
+  --ak-danger: #F87171;
+  --ak-warning: #FBBF24;
+  --ak-info: #60A5FA;
+}
+
+/* Optional: auto theme via OS preference. Remove if your app controls theme manually. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ak-bg: #0B1020;
+    --ak-fg: #F1F5F9;
+    --ak-muted: #94A3B8;
+    --ak-card: #111827;
+    --ak-border: #1F2937;
+    --ak-ring: rgba(37, 99, 235, 0.35);
+    --ak-focus: #60A5FA;
+    --ak-success: #22C55E;
+    --ak-danger: #F87171;
+    --ak-warning: #FBBF24;
+    --ak-info: #60A5FA;
+  }
+}
+
+.ak-surface {
+  color: var(--ak-fg);
+  background: var(--ak-bg);
+}
+
+.ak-card {
+  color: var(--ak-fg);
+  background: var(--ak-card);
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius-lg);
+  box-shadow: var(--ak-shadow-sm);
+}
+
+.ak-logo {
+  display: inline-block;
+  height: var(--ak-logo-height, 36px);
+  width: auto;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.ak-logo--sm { --ak-logo-height: 24px; }
+.ak-logo--md { --ak-logo-height: 28px; }
+.ak-logo--lg { --ak-logo-height: 36px; }
+.ak-logo--xl { --ak-logo-height: 48px; }
+
+.ak-icon {
+  display: inline-block;
+  height: var(--ak-icon-size, 28px);
+  width: var(--ak-icon-size, 28px);
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.ak-icon--sm { --ak-icon-size: 20px; }
+.ak-icon--md { --ak-icon-size: 28px; }
+.ak-icon--lg { --ak-icon-size: 48px; }
+
+.ak-logo-light { display: inline-block; }
+.ak-logo-dark { display: none; }
+
+.theme-dark .ak-logo-light,
+[data-theme="dark"] .ak-logo-light {
+  display: none;
+}
+
+.theme-dark .ak-logo-dark,
+[data-theme="dark"] .ak-logo-dark {
+  display: inline-block;
+}
+
+.ak-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 var(--ak-space-4);
+  border-radius: var(--ak-radius-md);
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.ak-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ak-ring);
+}
+
+.ak-button--primary {
+  color: #FFFFFF;
+  background: var(--ak-blue);
+}
+
+.ak-button--secondary {
+  color: var(--ak-fg);
+  background: var(--ak-card);
+  border-color: var(--ak-border);
+}
+
+.ak-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ak-space-5);
+  padding: var(--ak-space-4) var(--ak-space-5);
+  color: var(--ak-fg);
+  background: var(--ak-card);
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius-lg);
+  box-shadow: var(--ak-shadow-sm);
+}
+
+.ak-clearspace {
+  padding: max(24px, 1.5em);
+}

@@ -5,15 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ApproveKit Docs</title>
   <meta name="description" content="Developer documentation for ApproveKit: install, policy, guarded tools, web reviewer, audit trail, and demo commands.">
-  <link rel="icon" type="image/svg+xml" href="assets/approvekit_mark.svg">
+  <link rel="icon" href="assets/favicon/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon-180x180.png">
+  <link rel="manifest" href="assets/favicon/site.webmanifest">
+  <meta name="theme-color" content="#FFFFFF" id="theme-color">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem("approvekit-theme");
+        var systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var theme = saved || (systemDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
+<body class="docs-page">
   <header class="nav">
     <div class="container nav-inner">
       <a class="brand" href="index.html" aria-label="ApproveKit home">
-        <img src="assets/approvekit_mark.svg" alt="">
-        <span>ApproveKit</span>
+        <img class="brand-logo brand-logo-light" src="assets/logo/approvekit-logo-light.png" alt="ApproveKit">
+        <img class="brand-logo brand-logo-dark" src="assets/logo/approvekit-logo-dark.png" alt="ApproveKit">
       </a>
       <nav class="nav-links" aria-label="Primary">
         <a href="index.html">Home</a>
@@ -23,6 +43,14 @@
         <a href="#api">API</a>
         <a href="https://github.com/thegeekajay/ApproveKit">GitHub</a>
       </nav>
+      <button class="theme-toggle" type="button" aria-label="Toggle dark and light mode" aria-pressed="false">
+        <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5 3.6 3.6M20.4 20.4 19 19M19 5l1.4-1.4M3.6 20.4 5 19M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M20 14.4A7.8 7.8 0 0 1 9.6 4 8 8 0 1 0 20 14.4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -177,5 +205,28 @@ approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
       </section>
     </div>
   </main>
+  <script>
+    (function() {
+      var themeColor = document.getElementById("theme-color");
+      var themeToggle = document.querySelector(".theme-toggle");
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        try {
+          localStorage.setItem("approvekit-theme", theme);
+        } catch (error) {}
+        if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#0B1020" : "#FFFFFF");
+        if (themeToggle) themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+      }
+
+      if (themeToggle) {
+        themeToggle.addEventListener("click", function() {
+          var current = document.documentElement.getAttribute("data-theme") || "light";
+          applyTheme(current === "dark" ? "light" : "dark");
+        });
+        applyTheme(document.documentElement.getAttribute("data-theme") || "light");
+      }
+    })();
+  </script>
 </body>
 </html>

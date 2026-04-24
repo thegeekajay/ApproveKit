@@ -3,174 +3,487 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ApproveKit - Human approval for risky agent actions</title>
-  <meta name="description" content="ApproveKit is an open-source Python approval layer for risky AI agent actions. Wrap tools, require human review, redact payloads, and keep audit history.">
-  <link rel="icon" type="image/svg+xml" href="assets/approvekit_mark.svg">
+  <title>ApproveKit - Human approval gates for AI agents</title>
+  <meta name="description" content="ApproveKit is an open-source Python approval layer for risky AI agent actions. Wrap tools, pause dangerous calls, review them locally, redact payloads, and keep audit history.">
+  <link rel="icon" href="assets/favicon/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon-180x180.png">
+  <link rel="manifest" href="assets/favicon/site.webmanifest">
+  <meta name="theme-color" content="#0B1020" id="theme-color">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem("approvekit-theme");
+        var systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var theme = saved || (systemDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-  <header class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="index.html" aria-label="ApproveKit home">
-        <img src="assets/approvekit_mark.svg" alt="">
-        <span>ApproveKit</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="#why">Why</a>
-        <a href="#how">How it works</a>
-        <a href="#demo">Demo</a>
-        <a href="docs.html">Docs</a>
-        <a href="https://github.com/thegeekajay/ApproveKit">GitHub</a>
-      </nav>
-    </div>
-  </header>
+<body class="home-page">
+  <div class="site-shell">
+    <header class="nav" id="site-nav">
+      <div class="container nav-inner">
+        <a class="brand" href="index.html" aria-label="ApproveKit home">
+          <img class="brand-logo brand-logo-light" src="assets/logo/approvekit-logo-light.png" alt="ApproveKit">
+          <img class="brand-logo brand-logo-dark" src="assets/logo/approvekit-logo-dark.png" alt="ApproveKit">
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#control">Control</a>
+          <a href="#flow">Flow</a>
+          <a href="#proof">Proof</a>
+          <a href="#demo">Demo</a>
+          <a href="docs.html">Docs</a>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark and light mode" aria-pressed="false">
+          <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5 3.6 3.6M20.4 20.4 19 19M19 5l1.4-1.4M3.6 20.4 5 19M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="M20 14.4A7.8 7.8 0 0 1 9.6 4 8 8 0 1 0 20 14.4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <a class="nav-cta magnetic" href="https://github.com/thegeekajay/ApproveKit" target="_blank" rel="noopener">
+          <span>GitHub</span>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </header>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="eyebrow">Open-source approval middleware</span>
-          <h1>ApproveKit</h1>
-          <p>Human approval gates for risky AI agent actions. Wrap Python tools, pause dangerous calls, review them in a local browser, and keep a redacted audit trail.</p>
-          <div class="actions">
-            <a class="button primary" href="docs.html">Read the docs</a>
-            <a class="button secondary" href="#demo">See the demo flow</a>
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero-grid"></div>
+        <div class="container hero-inner">
+          <div class="hero-copy" data-reveal>
+            <span class="eyebrow"><span></span> Local-first approval middleware</span>
+            <h1>ApproveKit</h1>
+            <p class="hero-lede">A premium control layer for agent actions that should pause before they touch production. Wrap Python tools, route risky calls to a human, redact sensitive payloads, and keep the audit trail intact.</p>
+            <div class="hero-actions">
+              <a class="button primary magnetic" href="docs.html">
+                <span>Read docs</span>
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              <a class="button secondary magnetic" href="#control">
+                <span>Enter review room</span>
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div class="demo-shell" aria-label="ApproveKit reviewer preview">
-          <div class="demo-top">
-            <span>approvekit-web</span>
-            <span>http://127.0.0.1:8765</span>
-          </div>
-          <div class="demo-body">
-            <div class="review-panel">
-              <div class="request-preview">
-                <article class="request-card">
-                  <div class="request-head">
-                    <div>
-                      <div class="tool-name">send_email</div>
-                      <div class="pill-row">
-                        <span class="pill high">risk: high</span>
-                        <span class="pill">timeout: 45s</span>
-                        <span class="pill">pending</span>
-                      </div>
-                    </div>
-                  </div>
-                  <pre>{
+          <div class="hero-stage" data-reveal data-delay="0.12">
+            <div class="stage-top">
+              <div class="stage-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span>approvekit-web</span>
+              <strong>127.0.0.1:8765</strong>
+            </div>
+            <div class="stage-grid">
+              <div class="reviewer-panel">
+                <div class="panel-head">
+                  <span class="panel-label">Pending request</span>
+                  <span class="live-chip">waiting</span>
+                </div>
+                <div class="risk-score">
+                  <span>risk</span>
+                  <strong>high</strong>
+                  <small>45s timeout</small>
+                </div>
+                <div class="request-stack">
+                  <button class="request-row active" type="button" data-request="email">
+                    <span class="request-icon">01</span>
+                    <span>
+                      <strong>send_email</strong>
+                      <small>body redacted before storage</small>
+                    </span>
+                  </button>
+                  <button class="request-row" type="button" data-request="pii">
+                    <span class="request-icon">02</span>
+                    <span>
+                      <strong>pii_access</strong>
+                      <small>manager approval required</small>
+                    </span>
+                  </button>
+                  <button class="request-row" type="button" data-request="delete">
+                    <span class="request-icon">03</span>
+                    <span>
+                      <strong>delete_record</strong>
+                      <small>default-deny if abandoned</small>
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="payload-panel" aria-live="polite">
+                <div class="panel-head">
+                  <span class="panel-label">Payload preview</span>
+                  <span class="hash">req_8f29</span>
+                </div>
+                <pre id="payload-preview">{
   "to": "ceo@example.com",
   "subject": "Quarterly report",
   "body": "[REDACTED]"
 }</pre>
-                  <div class="decision-row">
-                    <div class="decision approve">Approve</div>
-                    <div class="decision reject">Reject</div>
-                  </div>
-                </article>
+                <div class="decision-actions">
+                  <button class="decision approve" type="button" data-decision="approved">Approve</button>
+                  <button class="decision reject" type="button" data-decision="rejected">Reject</button>
+                </div>
               </div>
             </div>
-            <div class="terminal-panel">
-              <div class="term-line">$ python3 demo/agent.py --reset</div>
-              <div class="term-line term-muted">Step 1: read_record auto-approved</div>
-              <div class="term-line">Step 2: send_email waiting...</div>
-              <div class="term-line term-muted">Reviewer approved request</div>
-              <div class="term-line">EXECUTED send_email</div>
-              <div class="term-line term-muted">Audit: send_email approved risk=high</div>
+            <div class="audit-strip">
+              <span class="audit-dot approved"></span>
+              <span id="audit-line">Audit ready: send_email pending human review</span>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+        <div class="hero-peek" aria-hidden="true">
+          <span>policy check</span>
+          <span>human decision</span>
+          <span>execution gate</span>
+          <span>audit trail</span>
+        </div>
+      </section>
 
-    <section class="section" id="why">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">Why teams need it</span>
-          <h2>Agents should not get production power without a checkpoint.</h2>
-          <p>ApproveKit makes human review a reusable middleware capability instead of one-off approval logic scattered through every tool.</p>
-        </div>
-        <div class="grid-3">
-          <article class="card">
-            <h3>Stop unsafe execution</h3>
-            <p>Rejected and timed-out requests never run the wrapped tool body. The default failure mode is deny.</p>
-          </article>
-          <article class="card">
-            <h3>Show the reviewer context</h3>
-            <p>Risk labels, arguments, notes, timestamps, and policy metadata stay attached to each request.</p>
-          </article>
-          <article class="card">
-            <h3>Keep audit history</h3>
-            <p>Every approval, rejection, timeout, and auto-approved call is persisted for local inspection.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+      <section class="section control-section" id="control">
+        <div class="container">
+          <div class="section-kicker" data-reveal>Control surface</div>
+          <div class="split-intro">
+            <h2 data-reveal>Give agents power with a checkpoint in the middle.</h2>
+            <p data-reveal data-delay="0.08">ApproveKit turns risky tool calls into reviewable events. The design goal is simple: every dangerous action becomes visible, explainable, and blockable before execution.</p>
+          </div>
 
-    <section class="section alt" id="how">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">How it works</span>
-          <h2>A small policy gate in the tool execution path.</h2>
-        </div>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <h3>Agent calls a guarded tool</h3>
-              <p>The `@kit.guard` decorator captures tool name and arguments before execution.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <h3>Policy decides approval mode</h3>
-              <p>Safe tools execute immediately. Risky tools become pending approval requests.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <h3>Reviewer approves or rejects</h3>
-              <p>The browser reviewer shows redacted payloads, risk labels, and decision notes.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div>
-              <h3>Audit is recorded</h3>
-              <p>Approved calls execute. Rejected and timed-out calls are blocked and logged.</p>
-            </div>
+          <div class="control-room">
+            <article class="metric-card" data-reveal>
+              <span>Default stance</span>
+              <strong>Deny on silence</strong>
+              <p>Rejected and timed-out actions never reach the wrapped tool body.</p>
+            </article>
+            <article class="metric-card accent" data-reveal data-delay="0.08">
+              <span>Reviewer latency</span>
+              <strong><span data-count="45">0</span>s</strong>
+              <p>Policy timeouts keep agent runs from waiting forever.</p>
+            </article>
+            <article class="metric-card" data-reveal data-delay="0.16">
+              <span>Storage</span>
+              <strong>SQLite audit</strong>
+              <p>Local-first history for approvals, rejects, timeouts, and auto-approvals.</p>
+            </article>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="section" id="demo">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">Run it locally</span>
-          <h2>Two terminals are enough for the MVP demo.</h2>
-          <p>The demo creates a shared SQLite database. The agent waits while the reviewer makes decisions in the browser.</p>
+      <section class="section flow-section" id="flow">
+        <div class="container">
+          <div class="section-kicker" data-reveal>Execution path</div>
+          <div class="flow-layout">
+            <div class="flow-copy">
+              <h2 data-reveal>One small guard changes the entire failure mode.</h2>
+              <p data-reveal data-delay="0.08">Safe tools can still move fast. Risky tools pause, surface context, and resume only after a reviewer makes a decision.</p>
+            </div>
+            <div class="flow-rail" data-reveal data-delay="0.12">
+              <div class="flow-step active">
+                <span>01</span>
+                <strong>Agent calls tool</strong>
+                <p>`@kit.guard` captures tool name and arguments before execution.</p>
+              </div>
+              <div class="flow-step">
+                <span>02</span>
+                <strong>Policy evaluates risk</strong>
+                <p>Rules decide whether the call can auto-approve or must wait.</p>
+              </div>
+              <div class="flow-step">
+                <span>03</span>
+                <strong>Reviewer decides</strong>
+                <p>The browser inbox shows redacted payload, risk level, and notes.</p>
+              </div>
+              <div class="flow-step">
+                <span>04</span>
+                <strong>Audit records outcome</strong>
+                <p>Approved calls execute. Rejected and timed-out calls are blocked.</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="code-grid">
-          <article class="card">
-            <h3>Terminal 1</h3>
-            <pre>python3 -m pip install -e ".[dev]"
+      </section>
+
+      <section class="section proof-section" id="proof">
+        <div class="container">
+          <div class="section-kicker" data-reveal>Safety primitives</div>
+          <div class="section-head centered" data-reveal>
+            <h2>The parts that matter when an agent is one click from production.</h2>
+            <p>Small primitives, deliberately boring where it counts, polished where humans need clarity.</p>
+          </div>
+          <div class="proof-grid">
+            <article class="proof-card" data-reveal>
+              <div class="proof-icon">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 3 20 7v5c0 5.2-3.2 8.5-8 10-4.8-1.5-8-4.8-8-10V7l8-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.5 12 2.2 2.2 4.8-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3>Tool-body isolation</h3>
+              <p>Approval happens before execution, so denied requests are not best-effort blocked after the fact.</p>
+            </article>
+            <article class="proof-card" data-reveal data-delay="0.06">
+              <div class="proof-icon warn">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 17h.01M10.3 4.7 2.8 18a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 4.7a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3>Policy-visible risk</h3>
+              <p>Risk labels, timeouts, redaction rules, and approval modes move with the request.</p>
+            </article>
+            <article class="proof-card" data-reveal data-delay="0.12">
+              <div class="proof-icon red">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3>Redacted payloads</h3>
+              <p>Configured fields are masked recursively before request storage and audit persistence.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section demo-section" id="demo">
+        <div class="container">
+          <div class="demo-layout">
+            <div class="demo-copy" data-reveal>
+              <span class="section-kicker">Run it locally</span>
+              <h2>Two terminals. One visible decision loop.</h2>
+              <p>The guided demo creates a shared SQLite database. The agent waits while the reviewer makes decisions in the browser.</p>
+              <div class="mini-facts">
+                <span>auto-approved read</span>
+                <span>approval-required email</span>
+                <span>rejected delete</span>
+                <span>timeout block</span>
+              </div>
+            </div>
+
+            <div class="command-deck" data-reveal data-delay="0.12">
+              <div class="command-card">
+                <div class="command-top">
+                  <span>Terminal 1</span>
+                  <small>agent</small>
+                </div>
+                <pre>python3 -m pip install -e ".[dev]"
 python3 demo/agent.py --db /tmp/approvekit_demo.db --reset</pre>
-          </article>
-          <article class="card">
-            <h3>Terminal 2</h3>
-            <pre>approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
-          </article>
+              </div>
+              <div class="command-card">
+                <div class="command-top">
+                  <span>Terminal 2</span>
+                  <small>reviewer</small>
+                </div>
+                <pre>approvekit-web --db /tmp/approvekit_demo.db --port 8765</pre>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
 
-  <footer class="footer">
-    <div class="container">
-      ApproveKit is MIT licensed and built for local-first agent governance demos.
-    </div>
-  </footer>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <img class="footer-logo footer-logo-light" src="assets/logo/approvekit-logo-light.png" alt="ApproveKit">
+          <img class="footer-logo footer-logo-dark" src="assets/logo/approvekit-logo-dark.png" alt="ApproveKit">
+          <span>MIT licensed human approval middleware for agent builders.</span>
+        </div>
+        <nav aria-label="Footer">
+          <a href="#control">Control</a>
+          <a href="#flow">Flow</a>
+          <a href="docs.html">Docs</a>
+          <a href="https://github.com/thegeekajay/ApproveKit">GitHub</a>
+        </nav>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  (function() {
+    "use strict";
+
+    var requests = {
+      email: {
+        status: "waiting",
+        hash: "req_8f29",
+        audit: "Audit ready: send_email pending human review",
+        payload: '{\n  "to": "ceo@example.com",\n  "subject": "Quarterly report",\n  "body": "[REDACTED]"\n}'
+      },
+      pii: {
+        status: "waiting",
+        hash: "req_19aa",
+        audit: "Audit ready: pii_access pending manager approval",
+        payload: '{\n  "record_id": "employee_1042",\n  "fields": ["ssn", "dob", "home_address"],\n  "reason": "benefits audit"\n}'
+      },
+      delete: {
+        status: "waiting",
+        hash: "req_d401",
+        audit: "Audit ready: delete_record will default-deny on timeout",
+        payload: '{\n  "table": "customer_records",\n  "id": "cust_77",\n  "cascade": true\n}'
+      }
+    };
+
+    var activeRequest = "email";
+    var nav = document.getElementById("site-nav");
+    var payload = document.getElementById("payload-preview");
+    var auditLine = document.getElementById("audit-line");
+    var hash = document.querySelector(".payload-panel .hash");
+    var liveChip = document.querySelector(".live-chip");
+    var themeColor = document.getElementById("theme-color");
+    var themeToggle = document.querySelector(".theme-toggle");
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      try {
+        localStorage.setItem("approvekit-theme", theme);
+      } catch (error) {}
+      if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#0B1020" : "#FFFFFF");
+      if (themeToggle) themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener("click", function() {
+        var current = document.documentElement.getAttribute("data-theme") || "light";
+        applyTheme(current === "dark" ? "light" : "dark");
+      });
+      applyTheme(document.documentElement.getAttribute("data-theme") || "light");
+    }
+
+    function setActiveRequest(key) {
+      activeRequest = key;
+      var data = requests[key];
+      document.querySelectorAll(".request-row").forEach(function(row) {
+        row.classList.toggle("active", row.dataset.request === key);
+      });
+      if (payload) payload.textContent = data.payload;
+      if (auditLine) auditLine.textContent = data.audit;
+      if (hash) hash.textContent = data.hash;
+      if (liveChip) liveChip.textContent = data.status;
+    }
+
+    document.querySelectorAll(".request-row").forEach(function(row) {
+      row.addEventListener("click", function() {
+        setActiveRequest(row.dataset.request);
+      });
+    });
+
+    document.querySelectorAll("[data-decision]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        var decision = button.dataset.decision;
+        var label = activeRequest;
+        requests[activeRequest].status = decision;
+        requests[activeRequest].audit = "Audit written: " + label + " " + decision + " by local reviewer";
+        setActiveRequest(activeRequest);
+        document.querySelector(".audit-strip").classList.remove("pulse");
+        window.requestAnimationFrame(function() {
+          document.querySelector(".audit-strip").classList.add("pulse");
+        });
+      });
+    });
+
+    function initReveals() {
+      var items = document.querySelectorAll("[data-reveal]");
+      if (!("IntersectionObserver" in window)) {
+        items.forEach(function(item) { item.classList.add("is-visible"); });
+        return;
+      }
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.16 });
+
+      items.forEach(function(item) {
+        var delay = item.dataset.delay;
+        if (delay) item.style.transitionDelay = delay + "s";
+        observer.observe(item);
+      });
+    }
+
+    function initCounters() {
+      var counters = document.querySelectorAll("[data-count]");
+      if (!counters.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          var target = parseInt(el.dataset.count, 10);
+          var start = performance.now();
+          function tick(now) {
+            var pct = Math.min((now - start) / 1200, 1);
+            var eased = 1 - Math.pow(1 - pct, 3);
+            el.textContent = Math.round(target * eased);
+            if (pct < 1) window.requestAnimationFrame(tick);
+          }
+          window.requestAnimationFrame(tick);
+          observer.unobserve(el);
+        });
+      }, { threshold: 0.7 });
+      counters.forEach(function(counter) { observer.observe(counter); });
+    }
+
+    function initPremiumMotion() {
+      if (window.Lenis) {
+        var lenis = new Lenis({
+          duration: 1.05,
+          easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+          smoothWheel: true
+        });
+        function raf(time) {
+          lenis.raf(time);
+          window.requestAnimationFrame(raf);
+        }
+        window.requestAnimationFrame(raf);
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+          anchor.addEventListener("click", function(event) {
+            var target = document.querySelector(anchor.getAttribute("href"));
+            if (target) {
+              event.preventDefault();
+              lenis.scrollTo(target, { offset: -72 });
+            }
+          });
+        });
+      }
+
+      if (window.gsap) {
+        document.querySelectorAll(".magnetic").forEach(function(el) {
+          el.addEventListener("mousemove", function(event) {
+            var rect = el.getBoundingClientRect();
+            var x = event.clientX - rect.left - rect.width / 2;
+            var y = event.clientY - rect.top - rect.height / 2;
+            window.gsap.to(el, { x: x * 0.14, y: y * 0.18, duration: 0.35, ease: "power3.out" });
+          });
+          el.addEventListener("mouseleave", function() {
+            window.gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.35)" });
+          });
+        });
+      }
+    }
+
+    function updateNav() {
+      if (nav) nav.classList.toggle("is-scrolled", window.scrollY > 24);
+    }
+
+    window.addEventListener("scroll", updateNav, { passive: true });
+    window.addEventListener("load", initPremiumMotion);
+    updateNav();
+    initReveals();
+    initCounters();
+  })();
+  </script>
 </body>
 </html>
