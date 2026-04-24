@@ -17,7 +17,7 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 - [x] Upgrade the demo so it clearly shows auto-approve, approve, reject, timeout/default-deny, and redaction.
 - [x] Publish a static website and docs page explaining the product and integration path.
 - [x] Add OSS polish: changelog, license, package metadata, and CI.
-- [ ] Keep implementation in small commits with clear commit messages.
+- [x] Keep implementation in small commits with clear commit messages.
 
 ## Day-by-Day Build Plan
 
@@ -39,9 +39,9 @@ ApproveKit is moving from a working Python library into a demo-ready open source
 
 ### Day 3 Buffer: Polish and Release Readiness
 
-- [ ] Run full tests.
-- [ ] Review website copy and mobile layout.
-- [ ] Finalize tracker checkboxes.
+- [x] Run full tests.
+- [x] Review website copy and mobile layout.
+- [x] Finalize tracker checkboxes.
 - [ ] Prepare for a `v0.1.0` tag when ready.
 
 ## Demo Acceptance Criteria
