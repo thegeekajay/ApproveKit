@@ -170,6 +170,33 @@ python3 -m pip install -e ".[dev]"
 python3 -m pytest -q
 ```
 
+## Maintainer Release Flow
+
+The repository supports one-command patch/minor/major releases via `release.py`.
+
+Prerequisites:
+
+- `gh` CLI is installed and authenticated (`gh auth login`).
+- GitHub repository secrets are set for Actions publishing:
+  - `TEST_PYPI_API_TOKEN`
+  - `PYPI_API_TOKEN`
+
+One-command patch release:
+
+```bash
+python3 release.py patch
+```
+
+What it does:
+
+- bumps version in `pyproject.toml` and `approvekit/__init__.py`
+- scaffolds a new `CHANGELOG.md` release section
+- runs tests + build + twine checks
+- commits, tags, and pushes (`vX.Y.Z`)
+- creates a GitHub Release (`gh release create`)
+
+Publishing is then handled automatically by `.github/workflows/publish-pypi.yml` when the release is published.
+
 ## Documentation
 
 - Landing page: `index.html`
